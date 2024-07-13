@@ -1,28 +1,20 @@
-import mysql.connector
+from sqlalchemy.orm import sessionmaker
+from DbConnection import Base, engine, Session, URL
 
 class SearchHandler:
     def __init__(self):
-        self.db = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="Akshayaa_19",
-            database="URLREC"
-        )
-        self.cursor = self.db.cursor()
-        self.last_searched_keyword = None
+        # Initialize database connection and create tables if they don't exist
+        Base.metadata.create_all(bind=engine)
+        self.Session = Session
 
     def search_urls(self, keyword):
-        query = "SELECT url, url_savetime FROM URLs WHERE keywords LIKE %s ORDER BY url_savetime DESC"
-        self.cursor.execute(query, (f"%{keyword}%",))
-        results = self.cursor.fetchall()
-        last_searched_keyword = keyword 
-        print(last_searched_keyword) # Save the last searched keyword
+        # Search for URLs in the database that contain the given keyword in their keywords
+        session = self.Session()
+        # Perform a case-insensitive search for the keyword in the 'keywords' field and order results by save time in descending order
+        results = session.query(URL.url, URL.url_savetime).filter(URL.keywords.like(f'%{keyword}%')).order_by(URL.url_savetime.desc()).all()
+        session.close()
         return results
 
-    def get_last_searched_keyword(self):
-        print(self.last_searched_keyword)
-        return self.last_searched_keyword
-
     def close_connection(self):
-        self.cursor.close()
-        self.db.close()
+        # Close the database connection
+        self.Session().close()
