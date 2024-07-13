@@ -1,10 +1,13 @@
-
 bs4
 spacy
 datetime
-
 nltk
+torch
 requests
+scgehule
 scikit-learn
 spacy
+tensorflow
+time
+torchvision
 urllib
