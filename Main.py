@@ -87,8 +87,7 @@ class URLManager:
             print(f"An error occurred while sending email: {e}")
 
     def schedule_recommendations(self):
-        # Schedule email sending every day at 09:00
-       schedule.every().day.at("09:00").do(self.send_recommendation_email)
+       schedule.every().day.at("00:38").do(self.send_recommendation_email)
        
 
     def run_scheduler(self):
@@ -104,6 +103,7 @@ class URLManager:
         self.scheduler_thread.start()
 
         # Schedule email sending
+       
         self.schedule_recommendations()
 
         while True:
