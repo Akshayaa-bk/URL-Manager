@@ -1,5 +1,6 @@
 from DbConnection import Base, engine, Session, URL
 from email_sender import send_email  
+from sqlalchemy import or_
 
 class Recommender:
     def __init__(self):
@@ -15,11 +16,18 @@ class Recommender:
         # Split the keywords into a list, or return an empty list if no keywords are found
         return keywords[0].split(', ') if keywords else []
 
+    
+    
     def get_urls_by_keywords(self, keywords):
-        # Retrieve URLs from the database that match the given keywords
+        # Retrieve URLs from the database where at least one keyword matches
         session = self.Session()
-        # Perform a search for the keywords in the 'keywords' field and order results by save time in descending order, limiting to 5 results
-        query = session.query(URL.url, URL.url_savetime).filter(URL.keywords.like(f'%{keywords}%')).order_by(URL.url_savetime.desc()).limit(5).all()
+
+        # Constructing OR conditions for each keyword from the last saved URL
+        keyword_filters = [URL.keywords.like(f'%{keyword}%') for keyword in keywords]
+
+        # Querying distinct URLs where at least one keyword matches
+        query = session.query(URL.url, URL.url_savetime).filter(or_(*keyword_filters)).order_by(URL.url_savetime.desc()).limit(5).all()
+
         session.close()
         return query
 
@@ -35,7 +43,7 @@ class Recommender:
             subject = "Daily Recommendations"
             body = "Recommended URLs:\n"
             for url, savetime in recommendations:
-                body += f"{url}\n"
+                body += f"{url} \n"
             send_email(receiver_email, subject, body)
         else:
             print("No recommendations found.")
