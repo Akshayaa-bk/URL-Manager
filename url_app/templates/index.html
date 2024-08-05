@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='extended_beauty.css') }}" />
+{% endblock %}
+
+{% block content %}
+
+<h1>Welcome to url Manager</h1>
+<center>
+  <p>
+    Keep track of your urls with Url manager. Get daily recommendations!
+  </p>
+</center>
+
+{% endblock %}
